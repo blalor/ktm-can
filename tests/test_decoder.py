@@ -27,7 +27,7 @@ def decode(decoder, msg):
 class TestDecoder(object):
     decoder = Decoder()
 
-    def test_120(self, tmpdir):
+    def test_120(self):
         parsed = decode(self.decoder, make_msg("120,06,79,00,00,00,00,00,3F"))
 
         assert len(parsed) == 4
@@ -36,26 +36,26 @@ class TestDecoder(object):
         assert parsed[0x120, "kill_switch"] == 0
         assert parsed[0x120, "throttle_map"] == 0
 
-    def test_129(self, tmpdir):
+    def test_129(self):
         parsed = decode(self.decoder, make_msg("129,30,00,00,00,00,00,00,30"))
 
         assert len(parsed) == 2
         assert parsed[0x129, "gear"] == 3
         assert parsed[0x129, "clutch"] == 0
 
-    def test_12A_map1(self, tmpdir):
+    def test_12A_map1(self):
         parsed = decode(self.decoder, make_msg("12A,13,68,00,20,00,00,00,00"))
 
         assert len(parsed) == 1
         assert parsed[0x12A, "requested_throttle_map"] == 1
 
-    def test_12A_map2(self, tmpdir):
+    def test_12A_map2(self):
         parsed = decode(self.decoder, make_msg("12A,13,28,00,20,00,00,00,00"))
 
         assert len(parsed) == 1
         assert parsed[0x12A, "requested_throttle_map"] == 0
 
-    def test_12B(self, tmpdir):
+    def test_12B(self):
         parsed = decode(self.decoder, make_msg("12B,00,00,00,00,00,02,BF,FD"))
 
         assert len(parsed) == 2

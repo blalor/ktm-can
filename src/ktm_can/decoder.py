@@ -36,6 +36,8 @@ class Decoder(object):
         """yields (id, key, value) tuples for known data in a Message"""
 
         if msg.id == 0x120:
+            ## Received every 20ms
+
             ## D0, D1 -- engine rpm
             yield msg.id, "rpm", struct.unpack(">H", msg.data[0:2])[0]
 
@@ -68,6 +70,8 @@ class Decoder(object):
                 ])
 
         elif msg.id == 0x129:
+            ## Received every 20ms
+
             ## D0, B0..B4 -- gear position; 0 is neutral
             yield msg.id, "gear", hi_nibble(msg.data[0])
 
@@ -96,6 +100,8 @@ class Decoder(object):
                 ])
 
         elif msg.id == 0x12A:
+            ## Received every 50ms
+
             ## D0 -- unknown
 
             ## D1, B1 -- requested throttle map: 0 == mode 1, 1 == mode 2
@@ -121,6 +127,8 @@ class Decoder(object):
                 ])
 
         elif msg.id == 0x12B:
+            ## Received every 10ms
+
             ## D0     -- always 0
             ## D1     -- always 0
             ## D2..D3 -- unknown, looks like a number
