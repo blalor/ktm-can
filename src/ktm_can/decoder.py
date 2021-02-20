@@ -17,12 +17,8 @@ def signed12(value):
     return -(value & 0b100000000000) | (value & 0b011111111111)
 
 
-class Message(object):
-    """a message read from the bus"""
-    def __init__(self, sender_id, data):
-        super(Message, self).__init__()
-        self.id = sender_id
-        self.data = data
+def invert(value):
+    return (~value & 0xFF)
 
 
 class Decoder(object):
@@ -62,8 +58,8 @@ class Decoder(object):
                     "__",
                     "__",
                     "__",
-                    "{:02X}".format(msg.data[3] & (~0b00010000 & 0xFF)),
-                    "{:02X}".format(msg.data[4] & (~0b00000001 & 0xFF)),
+                    "{:02X}".format(msg.data[3] & invert(0b00010000)),
+                    "{:02X}".format(msg.data[4] & invert(0b00000001)),
                     "{:02X}".format(msg.data[5]),
                     "{:02X}".format(msg.data[6]),
                     "__", # "{:02X}".format(msg.data[7]),              ## counter?
@@ -107,32 +103,40 @@ class Decoder(object):
             ## D1, B1 -- requested throttle map: 0 == mode 1, 1 == mode 2
             yield msg.id, "requested_throttle_map", (msg.data[1] & 0b01000000) >> 6
 
-            ## D2 -- unknown
+            ## D2 -- always 0
+            assert msg.data[2] == 0
+
             ## D3 -- unknown
-            ## D4 -- unknown
-            ## D5 -- unknown
-            ## D6 -- unknown
-            ## D7 -- unknown
+
+            ## D4..D8 -- always 0
+            assert msg.data[4] == 0
+            assert msg.data[5] == 0
+            assert msg.data[6] == 0
+            assert msg.data[7] == 0
 
             if self.emit_unmapped:
                 yield msg.id, "unmapped", " ".join([
                     "{:02X}".format(msg.data[0]),
-                    "{:02X}".format(msg.data[1] & (~0b01000000 & 0xFF)),
-                    "{:02X}".format(msg.data[2]),
+                    "{:02X}".format(msg.data[1] & invert(0b01000000)),
+                    "__", # "{:02X}".format(msg.data[2]),
                     "{:02X}".format(msg.data[3]),
-                    "{:02X}".format(msg.data[4]),
-                    "{:02X}".format(msg.data[5]),
-                    "{:02X}".format(msg.data[6]),
-                    "{:02X}".format(msg.data[7]),
+                    "__", # "{:02X}".format(msg.data[4]),
+                    "__", # "{:02X}".format(msg.data[5]),
+                    "__", # "{:02X}".format(msg.data[6]),
+                    "__", # "{:02X}".format(msg.data[7]),
                 ])
 
         elif msg.id == 0x12B:
             ## Received every 10ms
 
-            ## D0     -- always 0
-            ## D1     -- always 0
+            ## D0..D1  -- always 0
+            assert msg.data[0] == 0
+            assert msg.data[1] == 0
+
             ## D2..D3 -- unknown, looks like a number
+
             ## D4     -- always 0
+            assert msg.data[4] == 0
 
             ## D5..D7 -- lean angle, tilt
             ## from Dan Plastina:

@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-from ktm_can.decoder import Decoder, Message
+from ktm_can.decoder import Decoder
 import os
 import struct
 
@@ -22,6 +22,14 @@ def decode(decoder, msg):
         parsed[sender, key] = value
 
     return parsed
+
+
+class Message(object):
+    """a message read from the bus"""
+    def __init__(self, sender_id, data):
+        super(Message, self).__init__()
+        self.id = sender_id
+        self.data = data
 
 
 class TestDecoder(object):
@@ -61,6 +69,8 @@ class TestDecoder(object):
         assert len(parsed) == 2
         assert parsed[0x12B, "tilt?"] == 43
         assert parsed[0x12B, "lean?"] == -3
+        ## @todo front wheel speed
+        ## @todo rear wheel speed
 
     def test_450(self):
         parsed = decode(self.decoder, make_msg("450,00,00,01,00,00,00,00,00"))
