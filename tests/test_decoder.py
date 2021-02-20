@@ -35,3 +35,10 @@ class TestDecoder(object):
         assert parsed[0x120, "throttle"] == 0
         assert parsed[0x120, "kill_switch"] == 0
         assert parsed[0x120, "throttle_map"] == 0
+
+    def test_129(self, tmpdir):
+        parsed = decode(self.decoder, make_msg("129,30,00,00,00,00,00,00,30"))
+
+        assert len(parsed) == 2
+        assert parsed[0x129, "gear"] == 3
+        assert parsed[0x129, "clutch"] == 0
