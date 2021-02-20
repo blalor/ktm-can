@@ -54,3 +54,10 @@ class TestDecoder(object):
 
         assert len(parsed) == 1
         assert parsed[0x12A, "requested_throttle_map"] == 0
+
+    def test_12B(self, tmpdir):
+        parsed = decode(self.decoder, make_msg("12B,00,00,00,00,00,02,BF,FD"))
+
+        assert len(parsed) == 2
+        assert parsed[0x12B, "tilt?"] == 43
+        assert parsed[0x12B, "lean?"] == -3

@@ -13,6 +13,10 @@ def hi_nibble(b):
     return (b >> 4) & 0x0F
 
 
+def signed12(value):
+    return -(value & 0b100000000000) | (value & 0b011111111111)
+
+
 class Message(object):
     """a message read from the bus"""
     def __init__(self, sender_id, data):
@@ -114,4 +118,42 @@ class Decoder(object):
                     "{:02X}".format(msg.data[5]),
                     "{:02X}".format(msg.data[6]),
                     "{:02X}".format(msg.data[7]),
+                ])
+
+        elif msg.id == 0x12B:
+            ## D0     -- always 0
+            ## D1     -- always 0
+            ## D2..D3 -- unknown, looks like a number
+            ## D4     -- always 0
+
+            ## D5..D7 -- lean angle, tilt
+            ## from Dan Plastina:
+            #> Lean Angle – it’s provided by ID 299. The last 3 bytes (6,7,8)
+            #> split into two 12bit counters. The last 0x000 is for lean. I’ve
+            #> tested the lean extensively. 0x000 is neutral, 0x001 starts
+            #> leaning to the right. 0xFFF starts leaning to the left. I
+            #> *believe* the first 0x000 are tilt but I’ve yet to validate.
+
+            ## this looks like a 12-bit two's complement signed integer
+            ## https://stackoverflow.com/a/32262478/53051
+
+            # @todo confirm
+            yield msg.id, "tilt?", signed12((msg.data[5] << 4) | hi_nibble(msg.data[6]))
+
+            # @todo confirm
+            yield msg.id, "lean?", signed12((lo_nibble(msg.data[6]) << 8) | msg.data[7])
+
+            ## this looks like a number, but can't find a correlation in the data
+            # yield msg.id, "@todo trace", struct.unpack(">H", msg.data[2:4])
+
+            if self.emit_unmapped:
+                yield msg.id, "unmapped", " ".join([
+                    "__", # "{:02X}".format(msg.data[0]),
+                    "__", # "{:02X}".format(msg.data[1]),
+                    "{:02X}".format(msg.data[2]),
+                    "{:02X}".format(msg.data[3]),
+                    "__", # "{:02X}".format(msg.data[4]),
+                    "__", # "{:02X}".format(msg.data[5]),
+                    "__", # "{:02X}".format(msg.data[6]),
+                    "__", # "{:02X}".format(msg.data[7]),
                 ])
