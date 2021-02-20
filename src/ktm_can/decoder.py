@@ -166,6 +166,38 @@ class Decoder(object):
                     "__", # "{:02X}".format(msg.data[7]),
                 ])
 
+        elif msg.id == 0x450:
+            # Received every 50ms
+
+            ## D0, D1 -- always 0
+            assert msg.data[0] == 0
+            assert msg.data[1] == 0
+
+            ## D2
+            yield msg.id, "traction_control_button", msg.data[2] & 0b00000001
+
+            ## D3 -- always 0
+            assert msg.data[3] == 0
+
+            ## D4 -- unknown; toggles between 0x00 and 0x09
+
+            ## D5..D7 -- always 0
+            assert msg.data[5] == 0
+            assert msg.data[6] == 0
+            assert msg.data[7] == 0
+
+            if self.emit_unmapped:
+                yield msg.id, "unmapped", " ".join([
+                    "__",
+                    "__",
+                    "{:02X}".format(msg.data[2] & 0b11111110),
+                    "__",
+                    "{:02X}".format(msg.data[4]),
+                    "__",
+                    "__",
+                    "__",
+                ])
+
         elif msg.id == 0x540:
             ## Received every 100ms
 
@@ -196,4 +228,3 @@ class Decoder(object):
                     "__",
                     "__",
                 ])
-

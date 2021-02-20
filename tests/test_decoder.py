@@ -62,6 +62,12 @@ class TestDecoder(object):
         assert parsed[0x12B, "tilt?"] == 43
         assert parsed[0x12B, "lean?"] == -3
 
+    def test_450(self):
+        parsed = decode(self.decoder, make_msg("450,00,00,01,00,00,00,00,00"))
+
+        assert len(parsed) == 1
+        assert parsed[0x450, "traction_control_button"] == 1
+
     def test_540(self):
         parsed = decode(self.decoder, make_msg("540,02,06,65,00,01,00,01,DD"))
 
