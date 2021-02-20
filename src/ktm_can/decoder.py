@@ -90,3 +90,28 @@ class Decoder(object):
                     "{:02X}".format(msg.data[6]),
                     "__", # "{:02X}".format(msg.data[7]),              ## counter?
                 ])
+
+        elif msg.id == 0x12A:
+            ## D0 -- unknown
+
+            ## D1, B1 -- requested throttle map: 0 == mode 1, 1 == mode 2
+            yield msg.id, "requested_throttle_map", (msg.data[1] & 0b01000000) >> 6
+
+            ## D2 -- unknown
+            ## D3 -- unknown
+            ## D4 -- unknown
+            ## D5 -- unknown
+            ## D6 -- unknown
+            ## D7 -- unknown
+
+            if self.emit_unmapped:
+                yield msg.id, "unmapped", " ".join([
+                    "{:02X}".format(msg.data[0]),
+                    "{:02X}".format(msg.data[1] & (~0b01000000 & 0xFF)),
+                    "{:02X}".format(msg.data[2]),
+                    "{:02X}".format(msg.data[3]),
+                    "{:02X}".format(msg.data[4]),
+                    "{:02X}".format(msg.data[5]),
+                    "{:02X}".format(msg.data[6]),
+                    "{:02X}".format(msg.data[7]),
+                ])

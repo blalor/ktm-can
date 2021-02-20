@@ -42,3 +42,15 @@ class TestDecoder(object):
         assert len(parsed) == 2
         assert parsed[0x129, "gear"] == 3
         assert parsed[0x129, "clutch"] == 0
+
+    def test_12A_map1(self, tmpdir):
+        parsed = decode(self.decoder, make_msg("12A,13,68,00,20,00,00,00,00"))
+
+        assert len(parsed) == 1
+        assert parsed[0x12A, "requested_throttle_map"] == 1
+
+    def test_12A_map2(self, tmpdir):
+        parsed = decode(self.decoder, make_msg("12A,13,28,00,20,00,00,00,00"))
+
+        assert len(parsed) == 1
+        assert parsed[0x12A, "requested_throttle_map"] == 0
