@@ -61,3 +61,12 @@ class TestDecoder(object):
         assert len(parsed) == 2
         assert parsed[0x12B, "tilt?"] == 43
         assert parsed[0x12B, "lean?"] == -3
+
+    def test_540(self):
+        parsed = decode(self.decoder, make_msg("540,02,06,65,00,01,00,01,DD"))
+
+        assert len(parsed) == 4
+        assert parsed[0x540, "rpm"] == 1637
+        assert parsed[0x540, "kickstand_up"] is True
+        assert parsed[0x540, "kickstand_err"] is False
+        assert parsed[0x540, "coolant_temp"] == 47.7

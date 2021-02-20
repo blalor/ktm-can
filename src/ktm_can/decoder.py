@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-## decodes messages read from the KTM CaAN bus
+## decodes messages read from the KTM CAN bus
 
 import struct
 
@@ -165,3 +165,35 @@ class Decoder(object):
                     "__", # "{:02X}".format(msg.data[6]),
                     "__", # "{:02X}".format(msg.data[7]),
                 ])
+
+        elif msg.id == 0x540:
+            ## Received every 100ms
+
+            ## D0 -- always 0x02
+            assert msg.data[0] == 0x02
+
+            ## D1, D2 -- engine rpm; as 0x120, but updated more slowly
+            yield msg.id, "rpm", struct.unpack(">H", msg.data[1:3])[0]
+
+            ## D4 -- kickstand (1 is raised), kickstand error
+            yield msg.id, "kickstand_up", (msg.data[4] & 0b00000001) == 1
+            yield msg.id, "kickstand_err", ((msg.data[4] & 0b10000000) >> 7) == 1
+
+            ## D5 -- always 0x00
+            assert msg.data[5] == 0x00
+
+            ## D6 -- engine coolant, °C; compared to OBD2 value
+            yield msg.id, "coolant_temp", struct.unpack(">H", msg.data[6:])[0] / 10.0
+
+            if self.emit_unmapped:
+                yield msg.id, "unmapped", " ".join([
+                    "__",
+                    "__",
+                    "__",
+                    "{:02X}".format(msg.data[3]),
+                    "{:02X}".format(msg.data[4] & 0b01111110),
+                    "__",
+                    "__",
+                    "__",
+                ])
+
