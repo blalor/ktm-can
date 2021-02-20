@@ -41,7 +41,7 @@ class TestDecoder(object):
 
         assert len(parsed) == 2
         assert parsed[0x129, "gear"] == 3
-        assert parsed[0x129, "clutch"] == 0
+        assert parsed[0x129, "clutch_in"] is False
 
     def test_12A_map1(self):
         parsed = decode(self.decoder, make_msg("12A,13,68,00,20,00,00,00,00"))

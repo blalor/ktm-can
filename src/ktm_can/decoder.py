@@ -76,7 +76,7 @@ class Decoder(object):
             yield msg.id, "gear", hi_nibble(msg.data[0])
 
             ## D0, B5 -- clutch switch
-            yield msg.id, "clutch", (msg.data[0] & 0b00001000) >> 3
+            yield msg.id, "clutch_in", ((msg.data[0] & 0b00001000) >> 3) == 1
 
             ## D1 -- unknown
             ## D2 -- unknown
