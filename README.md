@@ -28,14 +28,14 @@ Module source is in [`src/ktm_can/decoder.py`](src/ktm_can/decoder.py).  Tests a
 
 ## message id overview
 
-| CAN ID          | Speed (ms) | Provides                                              | Model(s)       |
-|-----------------|------------|-------------------------------------------------------|----------------|
-| [`120`](120.md) | 20         | Engine RPM, throttle, kill switch, throttle map       | 690 Enduro R   |
-| [`129`](129.md) | 20         | Gear position, clutch switch                          | 690 Enduro R   |
-| [`12A`](12A.md) | 50         | Throttle map (requested)                              | 690 Enduro R   |
-| [`12B`](12B.md) | 10         | Front wheel speed, rear wheel speed, lean, tilt angle | 690 Enduro R   |
-| [`450`](450.md) | 50         | Traction control button                               | 690 Enduro R   |
-| [`540`](540.md) | 100        | Engine RPM, Side stand switch, coolant temp           | 690 Enduro R   |
+| CAN ID | Speed (ms) | Provides                                              | Model(s)       |
+|--------|------------|-------------------------------------------------------|----------------|
+| `120`  | 20         | Engine RPM, throttle, kill switch, throttle map       | 690 Enduro R   |
+| `129`  | 20         | Gear position, clutch switch                          | 690 Enduro R   |
+| `12A`  | 50         | Throttle map (requested)                              | 690 Enduro R   |
+| `12B`  | 10         | Front wheel speed, rear wheel speed, lean, tilt angle | 690 Enduro R   |
+| `450`  | 50         | Traction control button                               | 690 Enduro R   |
+| `540`  | 100        | Engine RPM, Side stand switch, coolant temp           | 690 Enduro R   |
 
 ## developing
 
