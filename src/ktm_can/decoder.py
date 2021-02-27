@@ -37,20 +37,19 @@ class Decoder(object):
             ## D0, D1 -- engine rpm
             yield msg.id, "rpm", struct.unpack(">H", msg.data[0:2])[0]
 
-            ## D2 -- (commanded?) throttle;
-            ## @todo confirm range; assumed to be 0-255
+            ## D2 -- (commanded) throttle; range 0-255
             yield msg.id, "throttle", msg.data[2]
 
             ## D3 B4 -- kill switch position
+            ## run == 1, stop == 0
             yield msg.id, "kill_switch", (msg.data[3] & 0b00010000) >> 4
 
-            ## D4, B7 -- throttle map
-            ## @todo determine if requested or actual
+            ## D4, B7 -- throttle map, actual
             yield msg.id, "throttle_map", msg.data[4] & 0b00000001
 
             ## D5 -- unknown
             ## D6 -- unknown
-            ## D7 -- counter
+            ## D7 -- counts through 30, 50, 70, 90, B0, D0, repeats
 
             ## no additional usable data found
             if self.emit_unmapped:
@@ -62,7 +61,7 @@ class Decoder(object):
                     "{:02X}".format(msg.data[4] & invert(0b00000001)),
                     "{:02X}".format(msg.data[5]),
                     "{:02X}".format(msg.data[6]),
-                    "__", # "{:02X}".format(msg.data[7]),              ## counter?
+                    "__",
                 ])
 
         elif msg.id == 0x129:
@@ -80,7 +79,7 @@ class Decoder(object):
             ## D4 -- unknown
             ## D5 -- unknown
             ## D6 -- unknown
-            ## D7 -- counter
+            ## D7 -- counts through 20, 40, 60, 80, A0, C0, repeats
 
             ## no additional usable data found
             if self.emit_unmapped:
@@ -92,7 +91,7 @@ class Decoder(object):
                     "{:02X}".format(msg.data[4]),
                     "{:02X}".format(msg.data[5]),
                     "{:02X}".format(msg.data[6]),
-                    "__", # "{:02X}".format(msg.data[7]),              ## counter?
+                    "__",
                 ])
 
         elif msg.id == 0x12A:
@@ -102,6 +101,10 @@ class Decoder(object):
 
             ## D1, B1 -- requested throttle map: 0 == mode 1, 1 == mode 2
             yield msg.id, "requested_throttle_map", (msg.data[1] & 0b01000000) >> 6
+
+            ## D1, B2 -- seems to be set to 1 after key turned on and ECU is
+            ## initialized(?) also flips when engine is started, but returns to
+            ## 1 when running
 
             ## D2 -- always 0
             assert msg.data[2] == 0
@@ -149,21 +152,15 @@ class Decoder(object):
             ## this looks like a 12-bit two's complement signed integer
             ## https://stackoverflow.com/a/32262478/53051
 
-            # @todo confirm
-            yield msg.id, "tilt?", signed12((msg.data[5] << 4) | hi_nibble(msg.data[6]))
-
-            # @todo confirm
-            yield msg.id, "lean?", signed12((lo_nibble(msg.data[6]) << 8) | msg.data[7])
-
-            ## this looks like a number, but can't find a correlation in the data
-            # yield msg.id, "@todo trace", struct.unpack(">H", msg.data[2:4])
+            yield msg.id, "tilt", signed12((msg.data[5] << 4) | hi_nibble(msg.data[6]))
+            yield msg.id, "lean", signed12((lo_nibble(msg.data[6]) << 8) | msg.data[7])
 
             if self.emit_unmapped:
                 yield msg.id, "unmapped", " ".join([
                     "__", # "{:02X}".format(msg.data[0]),
                     "__", # "{:02X}".format(msg.data[1]),
-                    "{:02X}".format(msg.data[2]),
-                    "{:02X}".format(msg.data[3]),
+                    "__", # "{:02X}".format(msg.data[2]),
+                    "__", # "{:02X}".format(msg.data[3]),
                     "__", # "{:02X}".format(msg.data[4]),
                     "__", # "{:02X}".format(msg.data[5]),
                     "__", # "{:02X}".format(msg.data[6]),
@@ -183,7 +180,14 @@ class Decoder(object):
             ## D3 -- always 0
             assert msg.data[3] == 0
 
-            ## D4 -- unknown; toggles between 0x00 and 0x09
+            ## D4 -- toggles between 0x00 and 0x09 when map button released; 09 for requesting map 1, 00 for requesting map 0
+            # 450                                  | __ __ 00 __ 09 __ __ __
+            # 12A requested_throttle_map           | 1
+            # 450                                  | __ __ 00 __ 00 __ __ __
+            # 12A requested_throttle_map           | 0
+            ## so looks like similar data, different place.
+            ## skipping parsing here because I feel like there are two bits
+            ## masquerading as a single value, which seems weird.
 
             ## D5..D7 -- always 0
             assert msg.data[5] == 0
@@ -214,6 +218,10 @@ class Decoder(object):
             ## D4 -- kickstand (1 is raised), kickstand error
             yield msg.id, "kickstand_up", (msg.data[4] & 0b00000001) == 1
             yield msg.id, "kickstand_err", ((msg.data[4] & 0b10000000) >> 7) == 1
+
+            ## D4, B3 -- 1 key on, kill switch on, not running; 0 after start;
+            ## returns to 1 after killing engine with kill switch and returning
+            ## to run position.
 
             ## D5 -- always 0x00
             assert msg.data[5] == 0x00
