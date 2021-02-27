@@ -170,6 +170,32 @@ class Decoder(object):
                     "__", # "{:02X}".format(msg.data[7]),
                 ])
 
+        elif msg.id == 0x290:
+            ## Received every 10ms
+
+            ## D0, D1 -- front brake
+            yield msg.id, "front_brake", struct.unpack(">H", msg.data[0:2])[0]
+
+            ## D2..D7 always 0
+            assert msg.data[2] == 0
+            assert msg.data[3] == 0
+            assert msg.data[4] == 0
+            assert msg.data[5] == 0
+            assert msg.data[6] == 0
+            assert msg.data[7] == 0
+
+            # if self.emit_unmapped:
+            #     yield msg.id, "unmapped", " ".join([
+            #         "__",
+            #         "__",
+            #         "{:02X}".format(msg.data[2]),
+            #         "{:02X}".format(msg.data[3]),
+            #         "{:02X}".format(msg.data[4]),
+            #         "{:02X}".format(msg.data[5]),
+            #         "{:02X}".format(msg.data[6]),
+            #         "{:02X}".format(msg.data[7]),
+            #     ])
+
         elif msg.id == 0x450:
             # Received every 50ms
 

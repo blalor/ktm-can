@@ -74,6 +74,12 @@ class TestDecoder(object):
         assert parsed[0x12B, "tilt"] == 40
         assert parsed[0x12B, "lean"] == -3
 
+    def test_290(self):
+        parsed = decode(self.decoder, make_msg("290,00,80,00,00,00,00,00,00"))
+
+        assert len(parsed) == 1
+        assert parsed[0x290, "front_brake"] == 128
+
     def test_450(self):
         parsed = decode(self.decoder, make_msg("450,00,00,01,00,00,00,00,00"))
 
