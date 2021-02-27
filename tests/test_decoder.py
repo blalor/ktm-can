@@ -52,16 +52,18 @@ class TestDecoder(object):
         assert parsed[0x129, "clutch_in"] is False
 
     def test_12A_map1(self):
-        parsed = decode(self.decoder, make_msg("12A,13,68,00,20,00,00,00,00"))
+        parsed = decode(self.decoder, make_msg("12A,11,28,00,20,00,00,00,00"))
 
-        assert len(parsed) == 1
-        assert parsed[0x12A, "requested_throttle_map"] == 1
+        assert len(parsed) == 2
+        assert parsed[0x12A, "requested_throttle_map"] == 0
+        assert parsed[0x12A, "throttle_open"] is True
 
     def test_12A_map2(self):
-        parsed = decode(self.decoder, make_msg("12A,13,28,00,20,00,00,00,00"))
+        parsed = decode(self.decoder, make_msg("12A,13,68,00,20,00,00,00,00"))
 
-        assert len(parsed) == 1
-        assert parsed[0x12A, "requested_throttle_map"] == 0
+        assert len(parsed) == 2
+        assert parsed[0x12A, "requested_throttle_map"] == 1
+        assert parsed[0x12A, "throttle_open"] is False
 
     def test_12B(self):
         parsed = decode(self.decoder, make_msg("12B,00,00,00,00,00,02,BF,FD"))

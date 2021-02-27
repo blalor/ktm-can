@@ -97,7 +97,11 @@ class Decoder(object):
         elif msg.id == 0x12A:
             ## Received every 50ms
 
-            ## D0 -- unknown
+            ## D0 -- throttle open/closed
+            ## 10 when throttle rises to 4, 12 when throttle goes back down to 3
+            ## probably connected to the map selection, which only changes when
+            ## the throttle is closed.
+            yield msg.id, "throttle_open", (msg.data[0] & 0b00000010) >> 1 == 0
 
             ## D1, B1 -- requested throttle map: 0 == mode 1, 1 == mode 2
             yield msg.id, "requested_throttle_map", (msg.data[1] & 0b01000000) >> 6
@@ -119,7 +123,7 @@ class Decoder(object):
 
             if self.emit_unmapped:
                 yield msg.id, "unmapped", " ".join([
-                    "{:02X}".format(msg.data[0]),
+                    "{:02X}".format(msg.data[0] & invert(0b00000010)),
                     "{:02X}".format(msg.data[1] & invert(0b01000000)),
                     "__", # "{:02X}".format(msg.data[2]),
                     "{:02X}".format(msg.data[3]),
