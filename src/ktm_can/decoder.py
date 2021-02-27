@@ -136,14 +136,13 @@ class Decoder(object):
         elif msg.id == 0x12B:
             ## Received every 10ms
 
-            ## D0..D1  -- always 0
-            assert msg.data[0] == 0
-            assert msg.data[1] == 0
+            ## D0..D1  -- front wheel speed
+            ## D2..D3 -- rear wheel speed
+            front_wheel, rear_wheel = struct.unpack(">HH", msg.data[0:4])
+            yield msg.id, "front_wheel", front_wheel
+            yield msg.id, "rear_wheel", rear_wheel
 
-            ## D2..D3 -- unknown, looks like a number
-
-            ## D4     -- always 0
-            assert msg.data[4] == 0
+            ## D4 -- unknown
 
             ## D5..D7 -- lean angle, tilt
             ## from Dan Plastina:
@@ -165,7 +164,7 @@ class Decoder(object):
                     "__", # "{:02X}".format(msg.data[1]),
                     "__", # "{:02X}".format(msg.data[2]),
                     "__", # "{:02X}".format(msg.data[3]),
-                    "__", # "{:02X}".format(msg.data[4]),
+                    "{:02X}".format(msg.data[4]),
                     "__", # "{:02X}".format(msg.data[5]),
                     "__", # "{:02X}".format(msg.data[6]),
                     "__", # "{:02X}".format(msg.data[7]),

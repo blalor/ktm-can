@@ -66,10 +66,12 @@ class TestDecoder(object):
         assert parsed[0x12A, "throttle_open"] is False
 
     def test_12B(self):
-        parsed = decode(self.decoder, make_msg("12B,00,00,00,00,00,02,BF,FD"))
+        parsed = decode(self.decoder, make_msg("12B,00,00,02,16,00,02,8F,FD"))
 
-        assert len(parsed) == 2
-        assert parsed[0x12B, "tilt"] == 43
+        assert len(parsed) == 4
+        assert parsed[0x12B, "front_wheel"] == 0 ## @todo better sample
+        assert parsed[0x12B, "rear_wheel"] == 534
+        assert parsed[0x12B, "tilt"] == 40
         assert parsed[0x12B, "lean"] == -3
 
     def test_450(self):
