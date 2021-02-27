@@ -33,7 +33,7 @@ class Message(object):
 
 
 class TestDecoder(object):
-    decoder = Decoder()
+    decoder = Decoder(enable_assertions=True)
 
     def test_120(self):
         parsed = decode(self.decoder, make_msg("120,06,79,00,00,00,00,00,3F"))

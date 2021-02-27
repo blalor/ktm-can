@@ -23,10 +23,15 @@ def invert(value):
 
 class Decoder(object):
     """decoder of Message objects"""
-    def __init__(self, emit_unmapped=False):
+    def __init__(self, emit_unmapped=False, enable_assertions=False):
         super(Decoder, self).__init__()
 
         self.emit_unmapped = emit_unmapped
+        self.enable_assertions = enable_assertions
+
+    def do_assert(self, condition, msg=None):
+        if self.enable_assertions:
+            assert condition
 
     def decode(self, msg):
         """yields (id, key, value) tuples for known data in a Message"""
@@ -111,15 +116,15 @@ class Decoder(object):
             ## 1 when running
 
             ## D2 -- always 0
-            assert msg.data[2] == 0
+            self.do_assert(msg.data[2] == 0)
 
             ## D3 -- unknown
 
             ## D4..D8 -- always 0
-            assert msg.data[4] == 0
-            assert msg.data[5] == 0
-            assert msg.data[6] == 0
-            assert msg.data[7] == 0
+            self.do_assert(msg.data[4] == 0)
+            self.do_assert(msg.data[5] == 0)
+            self.do_assert(msg.data[6] == 0)
+            self.do_assert(msg.data[7] == 0)
 
             if self.emit_unmapped:
                 yield msg.id, "unmapped", " ".join([
@@ -177,12 +182,12 @@ class Decoder(object):
             yield msg.id, "front_brake", struct.unpack(">H", msg.data[0:2])[0]
 
             ## D2..D7 always 0
-            assert msg.data[2] == 0
-            assert msg.data[3] == 0
-            assert msg.data[4] == 0
-            assert msg.data[5] == 0
-            assert msg.data[6] == 0
-            assert msg.data[7] == 0
+            self.do_assert(msg.data[2] == 0)
+            self.do_assert(msg.data[3] == 0)
+            self.do_assert(msg.data[4] == 0)
+            self.do_assert(msg.data[5] == 0)
+            self.do_assert(msg.data[6] == 0)
+            self.do_assert(msg.data[7] == 0)
 
             # if self.emit_unmapped:
             #     yield msg.id, "unmapped", " ".join([
@@ -200,14 +205,14 @@ class Decoder(object):
             # Received every 50ms
 
             ## D0, D1 -- always 0
-            assert msg.data[0] == 0
-            assert msg.data[1] == 0
+            self.do_assert(msg.data[0] == 0)
+            self.do_assert(msg.data[1] == 0)
 
             ## D2
             yield msg.id, "traction_control_button", msg.data[2] & 0b00000001
 
             ## D3 -- always 0
-            assert msg.data[3] == 0
+            self.do_assert(msg.data[3] == 0)
 
             ## D4 -- toggles between 0x00 and 0x09 when map button released; 09 for requesting map 1, 00 for requesting map 0
             # 450                                  | __ __ 00 __ 09 __ __ __
@@ -219,9 +224,9 @@ class Decoder(object):
             ## masquerading as a single value, which seems weird.
 
             ## D5..D7 -- always 0
-            assert msg.data[5] == 0
-            assert msg.data[6] == 0
-            assert msg.data[7] == 0
+            self.do_assert(msg.data[5] == 0)
+            self.do_assert(msg.data[6] == 0)
+            self.do_assert(msg.data[7] == 0)
 
             if self.emit_unmapped:
                 yield msg.id, "unmapped", " ".join([
@@ -239,7 +244,7 @@ class Decoder(object):
             ## Received every 100ms
 
             ## D0 -- always 0x02
-            assert msg.data[0] == 0x02
+            self.do_assert(msg.data[0] == 0x02)
 
             ## D1, D2 -- engine rpm; as 0x120, but updated more slowly
             yield msg.id, "rpm", struct.unpack(">H", msg.data[1:3])[0]
@@ -257,7 +262,7 @@ class Decoder(object):
             ## to run position.
 
             ## D5 -- always 0x00
-            assert msg.data[5] == 0x00
+            self.do_assert(msg.data[5] == 0x00)
 
             ## D6 -- engine coolant, °C; compared to OBD2 value
             yield msg.id, "coolant_temp", struct.unpack(">H", msg.data[6:])[0] / 10.0
