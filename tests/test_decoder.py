@@ -81,8 +81,19 @@ class TestDecoder(object):
     def test_540(self):
         parsed = decode(self.decoder, make_msg("540,02,06,65,00,01,00,01,DD"))
 
-        assert len(parsed) == 4
+        assert len(parsed) == 5
         assert parsed[0x540, "rpm"] == 1637
         assert parsed[0x540, "kickstand_up"] is True
         assert parsed[0x540, "kickstand_err"] is False
         assert parsed[0x540, "coolant_temp"] == 47.7
+        assert parsed[0x540, "gear"] == 0
+
+    def test_540_gear7(self):
+        parsed = decode(self.decoder, make_msg("540,02,06,AA,07,01,00,01,5B"))
+
+        assert len(parsed) == 5
+        assert parsed[0x540, "rpm"] == 1706
+        assert parsed[0x540, "kickstand_up"] is True
+        assert parsed[0x540, "kickstand_err"] is False
+        assert parsed[0x540, "coolant_temp"] == 34.7
+        assert parsed[0x540, "gear"] == 7

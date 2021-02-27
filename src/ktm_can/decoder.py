@@ -219,6 +219,10 @@ class Decoder(object):
             ## D1, D2 -- engine rpm; as 0x120, but updated more slowly
             yield msg.id, "rpm", struct.unpack(">H", msg.data[1:3])[0]
 
+            ## D3 -- also gear position (lo nibble)
+            ## 7 if unknown! so maybe QS-related?
+            yield msg.id, "gear", lo_nibble(msg.data[3])
+
             ## D4 -- kickstand (1 is raised), kickstand error
             yield msg.id, "kickstand_up", (msg.data[4] & 0b00000001) == 1
             yield msg.id, "kickstand_err", ((msg.data[4] & 0b10000000) >> 7) == 1
@@ -238,7 +242,7 @@ class Decoder(object):
                     "__",
                     "__",
                     "__",
-                    "{:02X}".format(msg.data[3]),
+                    "{:02X}".format(hi_nibble(msg.data[3])),
                     "{:02X}".format(msg.data[4] & 0b01111110),
                     "__",
                     "__",
