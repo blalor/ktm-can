@@ -1,6 +1,6 @@
 This repository contains a Python library for parsing CAN bus messages from KTM motorcycles.  It's intended to be documentation and a reference implementation that can be used to build real applications.
 
-It's still very much a work in progress, both in structure and content.
+There are a few things I'd like to explore, but it provides all the data I need for my project at this point.  I'm happy to accept contributions for additional message parsing and vehicle support, however.
 
 Credit for the original decoding goes to [Dan Plastina](https://advrider.com/f/members/dan-plastina.12530/) who documented his work in a [thread on advrider.com](https://advrider.com/f/threads/results-from-hacking-the-ktm-superduke-1290-can-bus.1200087/). Additional details have been included from others posting in that same thread.
 
