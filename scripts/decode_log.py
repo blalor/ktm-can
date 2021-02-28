@@ -6,10 +6,10 @@ import csv
 import struct
 from ktm_can.decoder import Decoder
 
-## parses CSV data with the following structure:
+## parses CSV data (from a file or stdin) with the following structure:
 ## Timestamp,ID,Data0,Data1,Data2,Data3,Data4,Data5,Data6,Data7,
 ##
-## emits parsed messages to stdout
+## emits parsed messages to stdout when they change
 
 
 class Message(object):
@@ -27,19 +27,6 @@ def make_msg(csv_str):
     return Message(int(rec[0], 16), pack_data(*[ int(d, 16) for d in rec[1:] ]))
 
 
-class DictOnChangeNotifier(dict):
-    def __init__(self, notifier):
-        self.__notifier = notifier
-
-        super(DictOnChangeNotifier, self).__init__()
-
-    def __setitem__(self, name, value):
-        old_val = self.get(name, None)
-        if old_val != value:
-            super(DictOnChangeNotifier, self).__setitem__(name, value)
-            self.__notifier(name, value)
-
-
 def main(fn=None):
     if fn is None:
         ifp = sys.stdin
@@ -48,23 +35,36 @@ def main(fn=None):
 
     reader = csv.reader(ifp)
 
-    decoded_msgs = DictOnChangeNotifier(lambda k, v: print("{:03X} {:32} | {}".format(k[0], k[1], v)))
+    decoded_msgs = {}
 
-    decoder = Decoder(emit_unmapped=True)
+    decoder = Decoder(emit_unmapped=True, enable_assertions=True)
 
     for rec in reader:
-        # ts = rec[0]
         try:
+            ts = int(rec[0])
             msg = make_msg(",".join(rec[1:]))
         except ValueError:
             continue
 
-        if msg.id in (0x12B,):
-            continue
+        # if msg.id in (0x12B,):
+        #     continue
 
         for msg_id, key, value in decoder.decode(msg):
-            if key in ("rpm", "coolant_temp", "throttle"):
-                continue
+            # if key in (
+            #     # "rpm",
+            #     "coolant_temp",
+            #     # "throttle",
+            #     "lean?",
+            #     "tilt?",
+            # ):
+            #     continue
+
+            if key == "unmapped":
+                key = ""
+
+            old_val = decoded_msgs.get((msg_id, key), None)
+            if old_val != value:
+                print("{:-6d} {:03X} {:32} | {}".format(ts, msg_id, key, value))
 
             decoded_msgs[msg_id, key] = value
 

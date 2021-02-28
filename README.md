@@ -26,6 +26,8 @@ Each byte contains 8 bits.
 
 Module source is in [`src/ktm_can/decoder.py`](src/ktm_can/decoder.py).  Tests are in the `tests` directory, and are intended to document raw message structure being parsed by the library and validated against known-good values.  The tests should give you a good idea of the data that's available, and the source contains comments with additional details, such as message frequency, assumptions about valid data, etc.
 
+Utility scripts are included in the `scripts` directory; I use these while working with live data and captured logs, mainly to verify functionality and to identify data that corresponds with actions (like turning a wheel or pressing a button).  They're rough because I mainly use them as live debugging aids, tweaking the source to filter out messages I'm not interested in, reduce noise, etc.
+
 ## message id overview
 
 | CAN ID | Speed (ms) | Provides                                                 | Model(s)       |
