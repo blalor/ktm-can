@@ -26,7 +26,7 @@ Each byte contains 8 bits.
 
 Module source is in [`src/ktm_can/decoder.py`](src/ktm_can/decoder.py).  Tests are in the `tests` directory, and are intended to document raw message structure being parsed by the library and validated against known-good values.  The tests should give you a good idea of the data that's available, and the source contains comments with additional details, such as message frequency, assumptions about valid data, etc.
 
-Utility scripts are included in the `scripts` directory; I use these while working with live data and captured logs, mainly to verify functionality and to identify data that corresponds with actions (like turning a wheel or pressing a button).  They're rough because I mainly use them as live debugging aids, tweaking the source to filter out messages I'm not interested in, reduce noise, etc.
+Utility scripts are included in the `scripts` directory; I use these while working with live data and captured logs, mainly to verify functionality and to identify data that corresponds with actions (like turning a wheel or pressing a button).  They're rough because I mainly use them as live debugging aids, tweaking the source to filter out messages I'm not interested in, reduce noise, etc.  Several of them depend on [python-can](https://python-can.readthedocs.io/en/master/) for reading live data.
 
 ## message id overview
 
@@ -49,6 +49,19 @@ Utility scripts are included in the `scripts` directory; I use these while worki
 4. install source for local development: `python3 setup.py develop`
 5. make changes
 6. run tests: `pytest`
+
+## hardware
+
+If you want to get on the (CAN) bus, you need some hardware. The following are what I used to connect to the KTM diagnostic port and access the data from my laptop:
+
+* 6-pin Sumitomo MT 090 male connector (p/n [6189-6171](http://prd.sws.co.jp/components/en/detail.php?number_s=61896171))
+* 4 terminals [8230-4408](http://prd.sws.co.jp/components/en/detail.php?number_s=82304408) or [1500-0105](http://prd.sws.co.jp/components/en/detail.php?number_s=15000105), depending on wire size
+* 4 wire seals [7160-8234](http://prd.sws.co.jp/components/en/detail.php?number_s=71608234)
+* 2 dummy plugs [7160-9465](http://prd.sws.co.jp/components/en/detail.php?number_s=71609465)
+* wire (duh?)
+* [USB-to-CAN adapter](https://www.seeedstudio.com/USB-CAN-Analyzer-p-2888.html)
+
+I purchased the connectors from [Cycle Terminal](http://www.cycleterminal.com/mt-series-090.html).
 
 ## contributing
 
